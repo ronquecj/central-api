@@ -108,12 +108,19 @@ const patchDocument = async (data) => {
     throw new Error('Template file not found');
   }
 
+  console.log(data);
+
   const content = fs.readFileSync(docPath, 'binary');
   const zip = new PizZip(content);
 
   const doc = new Docxtemplater(zip, {
     modules: [new ImageModule(imageOptions)],
   });
+
+  const decryptedName = CryptoJS.AES.decrypt(
+    `${data.userData.firstName} ${data.userData.lastName}`,
+    SECRET_KEY
+  ).toString(CryptoJS.enc.Utf8);
 
   const decryptedDate = CryptoJS.AES.decrypt(
     data.date,
@@ -131,6 +138,7 @@ const patchDocument = async (data) => {
 
   // Directly render the document with the data
   await doc.renderAsync({
+    name: decryptedName,
     date: decryptedDate,
     image: `data:image/png;base64,${qrCodeBase64}`, // Pass the base64 string directly
   });
