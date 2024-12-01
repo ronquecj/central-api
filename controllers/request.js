@@ -117,11 +117,6 @@ const patchDocument = async (data) => {
     modules: [new ImageModule(imageOptions)],
   });
 
-  const decryptedName = CryptoJS.AES.decrypt(
-    data.name,
-    SECRET_KEY
-  ).toString(CryptoJS.enc.Utf8);
-
   const decryptedDate = CryptoJS.AES.decrypt(
     data.date,
     SECRET_KEY
@@ -138,7 +133,7 @@ const patchDocument = async (data) => {
 
   // Directly render the document with the data
   await doc.renderAsync({
-    name: decryptedName,
+    name: data.name,
     date: decryptedDate,
     image: `data:image/png;base64,${qrCodeBase64}`, // Pass the base64 string directly
   });
@@ -243,16 +238,14 @@ export const markRequestAs = async (req, res) => {
       }
     );
 
-    // Check if the status is 'Processing' and trigger document patching and email
     if (status === 'Processing') {
-      // In markRequestAs, update this line
       const documentPath = await patchDocument({
         type: updatedRequest.type,
         date: updatedRequest.date,
         purpose: updatedRequest.purpose,
         quantity: updatedRequest.quantity,
         id: updatedRequest._id,
-        name: updatedRequest.name,
+        name: `${updatedRequest.userData.firstName} ${updatedRequest.userData.lastName}`,
       });
 
       // Send email to user with the document
