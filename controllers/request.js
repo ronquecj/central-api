@@ -118,7 +118,7 @@ const patchDocument = async (data) => {
   });
 
   const decryptedName = CryptoJS.AES.decrypt(
-    `${data.userData.firstName} ${data.userData.lastName}`,
+    data.name,
     SECRET_KEY
   ).toString(CryptoJS.enc.Utf8);
 
@@ -165,7 +165,7 @@ const patchDocument = async (data) => {
 // CREATE REQUEST
 export const newRequest = async (req, res) => {
   try {
-    const { type, date, purpose, quantity, id } = req.body;
+    const { type, date, purpose, quantity, id, name } = req.body;
     const user = await User.findById(id);
 
     const encryptedType = CryptoJS.AES.encrypt(
@@ -231,7 +231,7 @@ export const verifyRequest = async (req, res) => {
 
 export const markRequestAs = async (req, res) => {
   try {
-    const { id, status } = req.body;
+    const { id, status, name } = req.body;
     const filter = { _id: id };
     const update = { status };
 
@@ -252,6 +252,7 @@ export const markRequestAs = async (req, res) => {
         purpose: updatedRequest.purpose,
         quantity: updatedRequest.quantity,
         id: updatedRequest._id,
+        name: updatedRequest.name,
       });
 
       // Send email to user with the document
