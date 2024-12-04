@@ -122,9 +122,16 @@ const patchDocument = async (data) => {
     SECRET_KEY
   ).toString(CryptoJS.enc.Utf8);
 
+  const requestData = {
+    date: data.date,
+    purpose: data.purpose,
+    type: data.type,
+    quantity: data.quantity,
+  };
+
   // Generate QR Code
   const qrCodeData = {
-    requestData: decryptedDate,
+    requestData,
   };
 
   const qrCodeBase64 = await generateQRCode(
