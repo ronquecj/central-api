@@ -8,6 +8,12 @@ const UserSchema = new mongoose.Schema(
       min: 2,
       max: 50,
     },
+    middleName: {
+      type: String,
+      required: true,
+      min: 2,
+      max: 50,
+    },
     lastName: {
       type: String,
       required: true,
@@ -16,14 +22,8 @@ const UserSchema = new mongoose.Schema(
     },
     email: {
       type: String,
-      required: true,
+      required: false,
       max: 100,
-      unique: true,
-    },
-    username: {
-      type: String,
-      required: true,
-      max: 50,
       unique: true,
     },
     password: {
@@ -31,24 +31,24 @@ const UserSchema = new mongoose.Schema(
       required: true,
       min: 5,
     },
-    isAdmin: {
-      type: Boolean,
-      default: false,
+    dateOfBirth: {
+      type: String,
+      required: true,
     },
-    // dateOfBirth: {
-    //   type: String,
-    //   required: true,
-    // },
-    // gender: {
-    //   type: String,
-    //   required: true,
-    // },
+    placeOfBirth: {
+      type: String,
+      required: true,
+    },
+    sex: {
+      type: String,
+      required: true,
+    },
+    phoneNumber: {
+      type: String,
+      required: true,
+    },
     // age: {
     //   type: Number,
-    //   required: true,
-    // },
-    // phoneNumber: {
-    //   type: String,
     //   required: true,
     // },
     // city: {

@@ -8,16 +8,14 @@ export const registerUser = async (req, res) => {
   try {
     const {
       firstName,
+      middleName,
       lastName,
-      username,
+      email,
       password,
-      // dateOfBirth,
-      // gender,
-      // age,
-      // phoneNumber,
-      // city,
-      // province,
-      // zipcode,
+      dateOfBirth,
+      placeOfBirth,
+      sex,
+      phoneNumber,
     } = req.body;
 
     const salt = await bcryptjs.genSalt();
@@ -25,16 +23,14 @@ export const registerUser = async (req, res) => {
 
     const newUser = new User({
       firstName,
+      middleName,
       lastName,
-      username,
+      email,
       password: passwordHash,
-      // dateOfBirth,
-      // gender,
-      // age,
-      // phoneNumber,
-      // city,
-      // province,
-      // zipcode,
+      dateOfBirth,
+      placeOfBirth,
+      sex,
+      phoneNumber,
     });
 
     const savedUser = await newUser.save();
@@ -66,8 +62,8 @@ export const registerSuperAdmin = async (req, res) => {
 // LOGIN
 export const loginUser = async (req, res) => {
   try {
-    const { username, password } = req.body;
-    const user = await User.findOne({ username: username });
+    const { email, password } = req.body;
+    const user = await User.findOne({ email });
 
     if (!user)
       return res.status(400).json({ msg: 'User does not exist.' });
