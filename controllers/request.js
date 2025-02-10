@@ -33,7 +33,7 @@ const sendEmail = async (email, attachmentPath) => {
     service: 'gmail',
     auth: {
       user: 'ejdumaya23@gmail.com',
-      pass: 'qdja ugqq xjff jugc',
+      pass: 'oxgy nsgq rtso bnuh',
     },
   });
 
