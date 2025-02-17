@@ -130,7 +130,7 @@ const patchDocument = async (data) => {
   const requestData = {
     data: decryptedData,
   };
-
+  console.log('Decrypted request data:', requestData);
   // Generate QR Code
   const qrCodeData = {
     requestData,
