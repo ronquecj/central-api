@@ -122,15 +122,15 @@ const patchDocument = async (data) => {
     SECRET_KEY
   ).toString(CryptoJS.enc.Utf8);
 
-  const decryptedData = CryptoJS.AES.decrypt(
-    data,
-    SECRET_KEY
-  ).toString(CryptoJS.enc.Utf8);
-
   const requestData = {
-    data: decryptedData,
+    date: data.date,
+    purpose: data.purpose,
+    type: data.type,
+    quantity: data.quantity,
+    id: data.id,
+    name: data.name,
   };
-  console.log('Decrypted request data:', requestData);
+
   // Generate QR Code
   const qrCodeData = {
     requestData,
