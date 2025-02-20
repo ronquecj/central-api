@@ -30,6 +30,30 @@ const RequestSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    previousHash: {
+      type: String,
+      default: null,
+    },
+    history: [
+      {
+        status: {
+          type: String,
+          required: true,
+        },
+        modifiedBy: {
+          type: String,
+          required: true,
+        },
+        modifiedAt: {
+          type: Date,
+          default: Date.now,
+        },
+        hash: {
+          type: String,
+          required: true,
+        },
+      },
+    ],
   },
   { timestamps: true }
 );

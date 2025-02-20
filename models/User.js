@@ -47,22 +47,6 @@ const UserSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    // age: {
-    //   type: Number,
-    //   required: true,
-    // },
-    // city: {
-    //   type: String,
-    //   required: true,
-    // },
-    // province: {
-    //   type: String,
-    //   required: true,
-    // },
-    // zipcode: {
-    //   type: String,
-    //   required: true,
-    // },
   },
   { timestamps: true }
 );

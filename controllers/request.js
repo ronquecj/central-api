@@ -19,8 +19,8 @@ const SECRET_KEY = 'testkey';
 // Function to generate QR code as base64
 const generateQRCode = async (data) => {
   try {
-    const dataURL = await QRCode.toDataURL(data); // Generates a data URL
-    const base64 = dataURL.split(',')[1]; // Extracts the Base64 portion
+    const dataURL = await QRCode.toDataURL(data);
+    const base64 = dataURL.split(',')[1];
     return base64;
   } catch (err) {
     console.error('Error generating QR code:', err);
@@ -199,8 +199,14 @@ export const newRequest = async (req, res) => {
       quantity,
       userData: user,
       requestHash: requestHash,
+      history: [
+        {
+          status: 'Created',
+          modifiedBy: `${user.firstName} ${user.lastName}`,
+          hash: requestHash,
+        },
+      ],
     });
-    console.log(requestData);
 
     const savedRequest = await newRequest.save();
 
@@ -235,16 +241,32 @@ export const verifyRequest = async (req, res) => {
 
 export const markRequestAs = async (req, res) => {
   try {
-    const { id, status, name } = req.body;
-    const filter = { _id: id };
-    const update = { status };
+    const { id, status, modifiedBy } = req.body;
+    const request = await Request.findById(id);
 
-    const updatedRequest = await Request.findOneAndUpdate(
-      filter,
-      update,
+    if (!request) {
+      return res.status(404).json({ error: 'Request not found' });
+    }
+
+    const updateData = `${status}-${modifiedBy}-${request.requestHash}`;
+    const updateHash = CryptoJS.SHA256(updateData).toString();
+
+    const updatedRequest = await Request.findByIdAndUpdate(
+      id,
       {
-        new: true,
-      }
+        $set: {
+          previousHash: request.requestHash,
+          requestHash: updateHash,
+        },
+        $push: {
+          history: {
+            status,
+            modifiedBy,
+            hash: updateHash,
+          },
+        },
+      },
+      { new: true }
     );
 
     if (status === 'Processing') {
@@ -257,18 +279,32 @@ export const markRequestAs = async (req, res) => {
         name: `${updatedRequest.userData.firstName} ${updatedRequest.userData.lastName}`,
       });
 
-      // Send email to user with the document
       await sendEmail(updatedRequest.userData.email, documentPath);
 
-      res.status(200).json({
+      return res.status(200).json({
         message: 'Request processed, document sent via email',
         updatedRequest,
       });
-    } else {
-      res
-        .status(200)
-        .json({ message: 'Request status updated', updatedRequest });
     }
+
+    res
+      .status(200)
+      .json({ message: 'Request status updated', updatedRequest });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+export const getRequestHistory = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const request = await Request.findById(id);
+
+    if (!request) {
+      return res.status(404).json({ error: 'Request not found' });
+    }
+
+    res.status(200).json({ history: request.history });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -314,6 +350,33 @@ export const deleteRequest = async (req, res) => {
       message: 'Request deleted successfully',
       deletedRequest,
     });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+export const getAllRequestHistory = async (req, res) => {
+  try {
+    const requests = await Request.find({}, 'userData history');
+
+    if (!requests.length) {
+      return res
+        .status(404)
+        .json({ message: 'No request history found' });
+    }
+
+    const historyData = requests.map((request) => ({
+      user: `${request.userData.firstName} ${request.userData.lastName}`,
+      email: request.userData.email,
+      history: request.history.map((entry) => ({
+        status: entry.status,
+        modifiedBy: entry.modifiedBy,
+        hash: entry.hash,
+        timestamp: entry.modifiedAt,
+      })),
+    }));
+
+    res.status(200).json({ history: historyData });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
