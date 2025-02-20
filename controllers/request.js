@@ -255,6 +255,7 @@ export const markRequestAs = async (req, res) => {
       id,
       {
         $set: {
+          status,
           previousHash: request.requestHash,
           requestHash: updateHash,
         },
