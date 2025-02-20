@@ -52,6 +52,9 @@ const RequestSchema = new mongoose.Schema(
           type: String,
           required: true,
         },
+        previousHash: {
+          type: String,
+        },
       },
     ],
   },

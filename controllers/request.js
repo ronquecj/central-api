@@ -204,6 +204,7 @@ export const newRequest = async (req, res) => {
           status: 'Created',
           modifiedBy: `${user.firstName} ${user.lastName}`,
           hash: requestHash,
+          previousHash: null,
         },
       ],
     });
@@ -264,6 +265,7 @@ export const markRequestAs = async (req, res) => {
             status,
             modifiedBy,
             hash: updateHash,
+            previousHash: request.requestHash,
           },
         },
       },
@@ -358,7 +360,11 @@ export const deleteRequest = async (req, res) => {
 
 export const getAllRequestHistory = async (req, res) => {
   try {
-    const requests = await Request.find({}, 'userData history');
+    const requests = await Request.find(
+      {},
+      'userData history requestHash previousHash'
+    );
+    console.log('request', requests);
 
     if (!requests.length) {
       return res
@@ -369,16 +375,20 @@ export const getAllRequestHistory = async (req, res) => {
     const historyData = requests.map((request) => ({
       user: `${request.userData.firstName} ${request.userData.lastName}`,
       email: request.userData.email,
+      requestHash: request.requestHash,
+      previousHash: request.previousHash,
       history: request.history.map((entry) => ({
         status: entry.status,
         modifiedBy: entry.modifiedBy,
         hash: entry.hash,
         timestamp: entry.modifiedAt,
+        previousHash: entry.previousHash,
       })),
     }));
 
     res.status(200).json({ history: historyData });
   } catch (err) {
+    console.log(err.message);
     res.status(500).json({ error: err.message });
   }
 };

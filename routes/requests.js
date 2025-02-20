@@ -16,10 +16,10 @@ const router = express.Router();
 router.post('/new', newRequest);
 router.post('/mark', markRequestAs);
 router.get('/', getRequest);
-router.get('/:id', getRequestById);
 router.get('/verify/:id', verifyRequest);
 router.get('/:id/history', getRequestHistory);
 router.delete('/delete/:id', deleteRequest);
 router.get('/history', getAllRequestHistory);
+router.get('/:id', getRequestById);
 
 export default router;
