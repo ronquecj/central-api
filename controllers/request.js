@@ -10,6 +10,7 @@ import PizZip from 'pizzip';
 import { fileURLToPath } from 'url';
 import QRCode from 'qrcode';
 import ImageModule from 'docxtemplater-image-module-free';
+import tf from '@tensorflow/tfjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -390,5 +391,94 @@ export const getAllRequestHistory = async (req, res) => {
   } catch (err) {
     console.log(err.message);
     res.status(500).json({ error: err.message });
+  }
+};
+
+export const predictRequests = async (req, res) => {
+  try {
+    const requests = await Request.find().sort({ createdAt: 1 });
+
+    if (requests.length < 2) {
+      return res
+        .status(400)
+        .json({ message: 'Not enough data for accurate prediction' });
+    }
+
+    const requestData = requests.map((req) => ({
+      date: new Date(req.createdAt).getTime(),
+      quantity: req.quantity,
+    }));
+
+    const minDate = requestData[0].date;
+    const inputs = requestData.map(
+      (d) => (d.date - minDate) / 86400000
+    );
+    const outputs = requestData.map((d) => d.quantity);
+
+    const xs = tf.tensor2d(inputs, [inputs.length, 1]);
+    const ys = tf.tensor2d(outputs, [outputs.length, 1]);
+
+    const model = tf.sequential();
+    model.add(
+      tf.layers.dense({
+        units: 10,
+        activation: 'relu',
+        inputShape: [1],
+      })
+    );
+    model.add(tf.layers.dense({ units: 5, activation: 'relu' }));
+    model.add(tf.layers.dense({ units: 1 }));
+    model.compile({ loss: 'meanSquaredError', optimizer: 'adam' });
+
+    await model.fit(xs, ys, { epochs: 50 });
+
+    const futureDays = {
+      oneWeek: 7,
+      oneMonth: 30,
+      oneYear: 365,
+      fiveYears: 365 * 5,
+      tenYears: 365 * 10,
+    };
+
+    const predictions = {};
+
+    for (const [key, days] of Object.entries(futureDays)) {
+      const futureDate = (Date.now() - minDate) / 86400000 + days;
+      const prediction = model.predict(
+        tf.tensor2d([futureDate], [1, 1])
+      );
+      const predictedQuantity = prediction.dataSync()[0];
+
+      const avgQuantity =
+        outputs.reduce((a, b) => a + b, 0) / outputs.length;
+      predictions[key] =
+        predictedQuantity > 0
+          ? Math.round(predictedQuantity)
+          : Math.round(avgQuantity);
+    }
+
+    res.json({
+      predictedDates: {
+        oneWeek: new Date(
+          Date.now() + futureDays.oneWeek * 86400000
+        ).toISOString(),
+        oneMonth: new Date(
+          Date.now() + futureDays.oneMonth * 86400000
+        ).toISOString(),
+        oneYear: new Date(
+          Date.now() + futureDays.oneYear * 86400000
+        ).toISOString(),
+        fiveYears: new Date(
+          Date.now() + futureDays.fiveYears * 86400000
+        ).toISOString(),
+        tenYears: new Date(
+          Date.now() + futureDays.tenYears * 86400000
+        ).toISOString(),
+      },
+      predictedQuantities: predictions,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error' });
   }
 };
