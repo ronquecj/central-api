@@ -25,15 +25,6 @@ const UserSchema = new mongoose.Schema(
       required: false,
       max: 100,
       unique: true,
-      validate: {
-        validator: async function (value) {
-          const emailCount = await YourModel.countDocuments({
-            email: value,
-          });
-          return emailCount === 0;
-        },
-        message: 'This email is already registered.',
-      },
     },
     password: {
       type: String,
