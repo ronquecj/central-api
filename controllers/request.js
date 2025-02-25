@@ -11,6 +11,7 @@ import { fileURLToPath } from 'url';
 import QRCode from 'qrcode';
 import ImageModule from 'docxtemplater-image-module-free';
 import tf from '@tensorflow/tfjs';
+import { performance } from 'perf_hooks';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -71,12 +72,10 @@ function base64Parser(tagValue) {
     );
   }
 
-  // For Node.js, return a Buffer
   if (typeof Buffer !== 'undefined' && Buffer.from) {
     return Buffer.from(stringBase64, 'base64');
   }
 
-  // For browsers, return binary content as a Uint8Array
   const binaryString = window.atob(stringBase64);
   const len = binaryString.length;
   const bytes = new Uint8Array(len);
@@ -88,11 +87,10 @@ function base64Parser(tagValue) {
 
 const imageOptions = {
   getImage(tagValue) {
-    // Parse the base64 image data
     return base64Parser(tagValue);
   },
   getSize(img, tagValue, tagName, context) {
-    return [100, 100]; // Adjust the image size (as you see fit)
+    return [100, 100];
   },
 };
 
@@ -191,7 +189,12 @@ export const newRequest = async (req, res) => {
     ).toString();
 
     const requestData = `${type}-${date}-${purpose}-${quantity}-${user._id}`;
+
+    const startTime = performance.now();
     const requestHash = CryptoJS.SHA256(requestData).toString();
+    const endTime = performance.now();
+
+    const hashingTime = endTime - startTime;
 
     const newRequest = new Request({
       type: encryptedType,
@@ -206,6 +209,7 @@ export const newRequest = async (req, res) => {
           modifiedBy: `${user.firstName} ${user.lastName}`,
           hash: requestHash,
           previousHash: null,
+          hashingTime: hashingTime,
         },
       ],
     });
@@ -251,7 +255,12 @@ export const markRequestAs = async (req, res) => {
     }
 
     const updateData = `${status}-${modifiedBy}-${request.requestHash}`;
+
+    const startTime = performance.now();
     const updateHash = CryptoJS.SHA256(updateData).toString();
+    const endTime = performance.now();
+
+    const hashingTime = endTime - startTime;
 
     const updatedRequest = await Request.findByIdAndUpdate(
       id,
@@ -267,6 +276,7 @@ export const markRequestAs = async (req, res) => {
             modifiedBy,
             hash: updateHash,
             previousHash: request.requestHash,
+            hashingTime: hashingTime,
           },
         },
       },
@@ -384,6 +394,7 @@ export const getAllRequestHistory = async (req, res) => {
         hash: entry.hash,
         timestamp: entry.modifiedAt,
         previousHash: entry.previousHash,
+        hashingTime: entry.hashingTime,
       })),
     }));
 

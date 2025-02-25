@@ -55,6 +55,10 @@ const RequestSchema = new mongoose.Schema(
         previousHash: {
           type: String,
         },
+        hashingTime: {
+          type: String,
+          default: null,
+        },
       },
     ],
   },
