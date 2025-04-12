@@ -11,7 +11,6 @@ import { fileURLToPath } from 'url';
 import QRCode from 'qrcode';
 import ImageModule from 'docxtemplater-image-module-free';
 import tf from '@tensorflow/tfjs';
-import { performance } from 'perf_hooks';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -90,7 +89,7 @@ const imageOptions = {
     return base64Parser(tagValue);
   },
   getSize(img, tagValue, tagName, context) {
-    return [100, 100];
+    return [100, 100]; // Adjust the image size (as you see fit)
   },
 };
 
@@ -130,7 +129,6 @@ const patchDocument = async (data) => {
     name: data.name,
   };
 
-  // Generate QR Code
   const qrCodeData = {
     requestData,
   };
@@ -139,11 +137,10 @@ const patchDocument = async (data) => {
     JSON.stringify(qrCodeData)
   );
 
-  // Directly render the document with the data
   await doc.renderAsync({
     name: data.name,
     date: decryptedDate,
-    image: `data:image/png;base64,${qrCodeBase64}`, // Pass the base64 string directly
+    image: `data:image/png;base64,${qrCodeBase64}`,
   });
 
   const buf = doc.getZip().generate({ type: 'nodebuffer' });
@@ -189,12 +186,7 @@ export const newRequest = async (req, res) => {
     ).toString();
 
     const requestData = `${type}-${date}-${purpose}-${quantity}-${user._id}`;
-
-    const startTime = performance.now();
     const requestHash = CryptoJS.SHA256(requestData).toString();
-    const endTime = performance.now();
-
-    const hashingTime = endTime - startTime;
 
     const newRequest = new Request({
       type: encryptedType,
@@ -209,7 +201,6 @@ export const newRequest = async (req, res) => {
           modifiedBy: `${user.firstName} ${user.lastName}`,
           hash: requestHash,
           previousHash: null,
-          hashingTime: hashingTime,
         },
       ],
     });
@@ -255,12 +246,7 @@ export const markRequestAs = async (req, res) => {
     }
 
     const updateData = `${status}-${modifiedBy}-${request.requestHash}`;
-
-    const startTime = performance.now();
     const updateHash = CryptoJS.SHA256(updateData).toString();
-    const endTime = performance.now();
-
-    const hashingTime = endTime - startTime;
 
     const updatedRequest = await Request.findByIdAndUpdate(
       id,
@@ -276,7 +262,6 @@ export const markRequestAs = async (req, res) => {
             modifiedBy,
             hash: updateHash,
             previousHash: request.requestHash,
-            hashingTime: hashingTime,
           },
         },
       },
@@ -369,6 +354,19 @@ export const deleteRequest = async (req, res) => {
   }
 };
 
+export const deleteAllRequest = async (req, res) => {
+  try {
+    const deletedRequests = await Request.deleteMany({});
+
+    res.status(200).json({
+      message: 'All requests deleted successfully',
+      deletedCount: deletedRequests.deletedCount,
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
 export const getAllRequestHistory = async (req, res) => {
   try {
     const requests = await Request.find(
@@ -394,7 +392,6 @@ export const getAllRequestHistory = async (req, res) => {
         hash: entry.hash,
         timestamp: entry.modifiedAt,
         previousHash: entry.previousHash,
-        hashingTime: entry.hashingTime,
       })),
     }));
 

@@ -9,6 +9,7 @@ import {
   getRequestHistory,
   getAllRequestHistory,
   predictRequests,
+  deleteAllRequest,
 } from '../controllers/request.js';
 
 const router = express.Router();
@@ -20,6 +21,7 @@ router.get('/', getRequest);
 router.get('/verify/:id', verifyRequest);
 router.get('/:id/history', getRequestHistory);
 router.get('/predict', predictRequests);
+router.delete('/deleteall', deleteAllRequest);
 router.delete('/delete/:id', deleteRequest);
 router.get('/history', getAllRequestHistory);
 router.get('/:id', getRequestById);
