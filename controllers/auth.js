@@ -157,6 +157,7 @@ export const loginSuperAdmin = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
 export const loginAdmin = async (req, res) => {
   try {
     const { username, password } = req.body;
@@ -169,6 +170,12 @@ export const loginAdmin = async (req, res) => {
 
     if (!isMatch)
       return res.status(400).json({ msg: 'Invalid credentials.' });
+
+    if (user.status !== 'Approved') {
+      return res
+        .status(403)
+        .json({ msg: 'Account is not approved yet.' });
+    }
 
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
     delete user.password;
