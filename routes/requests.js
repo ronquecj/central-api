@@ -12,6 +12,8 @@ import {
   deleteAllRequest,
 } from '../controllers/request.js';
 
+import { markAdminAs } from '../controllers/adminver.js';
+
 const router = express.Router();
 
 // REQUEST
@@ -25,5 +27,7 @@ router.delete('/deleteall', deleteAllRequest);
 router.delete('/delete/:id', deleteRequest);
 router.get('/history', getAllRequestHistory);
 router.get('/:id', getRequestById);
+
+router.post('/mark-admin', markAdminAs);
 
 export default router;

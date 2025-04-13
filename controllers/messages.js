@@ -115,6 +115,16 @@ export const getMessages = async (req, res) => {
   }
 };
 
+export const getAllMessages = async (req, res) => {
+  try {
+    const messages = await Message.find({});
+
+    res.status(200).json(messages);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
 export const sendMessage = async (req, res) => {
   try {
     let { text, receiverModel, senderId, senderModel } = req.body;

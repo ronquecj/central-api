@@ -12,6 +12,7 @@ import QRCode from 'qrcode';
 import ImageModule from 'docxtemplater-image-module-free';
 import tf from '@tensorflow/tfjs';
 import { performance } from 'perf_hooks';
+import Admin from '../models/Admin.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -50,6 +51,34 @@ const sendEmail = async (email, attachmentPath) => {
         path: attachmentPath,
       },
     ],
+  };
+
+  await transporter.sendMail(mailOptions);
+};
+
+const sendStatusEmail = async (email, status) => {
+  const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: 'ejdumaya23@gmail.com',
+      pass: 'oxgy nsgq rtso bnuh',
+    },
+  });
+
+  const statusMessage =
+    status === 'Approved'
+      ? `Your account has been approved. You can now login with your account as a staff.`
+      : status === 'Processing'
+      ? `Your account is being processed. Please wait for the email confirmation when your account is approved.`
+      : status === 'Disapproved'
+      ? `Your account has been disapproved.`
+      : `Unknown status`;
+
+  const mailOptions = {
+    from: 'docsswift94@gmail.com',
+    to: email,
+    subject: 'Your Account Status',
+    text: statusMessage,
   };
 
   await transporter.sendMail(mailOptions);
@@ -242,63 +271,43 @@ export const verifyRequest = async (req, res) => {
   }
 };
 
-export const markRequestAs = async (req, res) => {
+export const markAdminAs = async (req, res) => {
   try {
     const { id, status, modifiedBy } = req.body;
-    const request = await Request.findById(id);
+    const admin = await Admin.findById(id);
 
-    if (!request) {
-      return res.status(404).json({ error: 'Request not found' });
+    if (!admin) {
+      return res.status(404).json({ error: 'Admin not found' });
     }
 
-    const updateData = `${status}-${modifiedBy}-${request.requestHash}`;
-    const startTime = performance.now();
-    const updateHash = CryptoJS.SHA256(updateData).toString();
-    const endTime = performance.now();
-    const hashingTime = endTime - startTime;
-
-    const updatedRequest = await Request.findByIdAndUpdate(
+    const updatedAdmin = await Admin.findByIdAndUpdate(
       id,
       {
         $set: {
           status,
-          previousHash: request.requestHash,
-          requestHash: updateHash,
         },
         $push: {
           history: {
             status,
             modifiedBy,
-            hash: updateHash,
-            previousHash: request.requestHash,
-            hashingTime: hashingTime,
           },
         },
       },
       { new: true }
     );
 
-    if (status === 'Processing') {
-      const documentPath = await patchDocument({
-        type: updatedRequest.type,
-        date: updatedRequest.date,
-        purpose: updatedRequest.purpose,
-        quantity: updatedRequest.quantity,
-        id: updatedRequest._id,
-        name: `${updatedRequest.userData.firstName} ${updatedRequest.userData.lastName}`,
-      });
-
-      await sendEmail(updatedRequest.userData.email, documentPath);
+    if (status) {
+      await sendStatusEmail(updatedAdmin.email, status);
 
       return res.status(200).json({
         message: 'Request processed, document sent via email',
-        updatedRequest,
+        updatedAdmin,
       });
     }
 
     res
       .status(200)
-      .json({ message: 'Request status updated', updatedRequest });
+      .json({ message: 'Request status updated', updatedAdmin });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
