@@ -43,6 +43,15 @@ export const registerUser = async (req, res) => {
 
 export const registerSuperAdmin = async (req, res) => {
   try {
+    const existingSuperAdmin = await SuperAdmin.findOne();
+
+    if (existingSuperAdmin) {
+      return res.status(400).json({
+        error:
+          'You can only register one superadmin account. Please delete or change the password of the existing superadmin account.',
+      });
+    }
+
     const { username, password } = req.body;
 
     const salt = await bcryptjs.genSalt();
@@ -60,16 +69,43 @@ export const registerSuperAdmin = async (req, res) => {
   }
 };
 
+export const changeSuperAdminPassword = async (req, res) => {
+  try {
+    const { username, newPassword } = req.body;
+
+    const superAdmin = await SuperAdmin.findOne({ username });
+
+    if (!superAdmin) {
+      return res
+        .status(404)
+        .json({ error: `Please check the superadmin's username.` });
+    }
+
+    const salt = await bcryptjs.genSalt();
+    const hashedPassword = await bcryptjs.hash(newPassword, salt);
+
+    superAdmin.password = hashedPassword;
+    await superAdmin.save();
+
+    res.status(200).json({
+      message: 'Password successfully updated.',
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
 export const registerAdmin = async (req, res) => {
   try {
-    const { username, password } = req.body;
+    const { email, password } = req.body;
 
     const salt = await bcryptjs.genSalt();
     const passwordHash = await bcryptjs.hash(password, salt);
 
     const newAdmin = new Admin({
-      username,
+      email,
       password: passwordHash,
+      history: [{ modifiedBy: email }],
     });
 
     const savedAdmin = await newAdmin.save();

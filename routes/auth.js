@@ -6,6 +6,7 @@ import {
   registerSuperAdmin,
   loginAdmin,
   registerAdmin,
+  changeSuperAdminPassword,
 } from '../controllers/auth.js';
 
 const router = express.Router();
@@ -17,6 +18,7 @@ router.post('/user/register', registerUser);
 // SuperAdmin
 router.post('/super-admin/login', loginSuperAdmin);
 router.post('/super-admin/register', registerSuperAdmin);
+router.post('/super-admin/change-password', changeSuperAdminPassword);
 
 // Admin
 router.post('/admin/login', loginAdmin);

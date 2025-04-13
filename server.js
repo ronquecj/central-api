@@ -44,31 +44,24 @@ const offlineMessages = new Map();
 io.on('connection', (socket) => {
   console.log('A user connected:', socket.id);
 
-  // Register user as online
   socket.on('userOnline', (userId) => {
     onlineUsers.set(userId, socket.id);
 
-    // Send any pending messages
     if (offlineMessages.has(userId)) {
       offlineMessages.get(userId).forEach((msg) => {
         io.to(socket.id).emit('receiveMessage', msg);
       });
-      offlineMessages.delete(userId); // Clear sent messages
+      offlineMessages.delete(userId);
     }
   });
 
-  // Handle incoming messages
   socket.on('sendMessage', (messageData) => {
     const { receiverId } = messageData;
 
-    // Save message to DB (already happens in sendMessage controller)
-
-    // Check if recipient is online
     const recipientSocket = onlineUsers.get(receiverId.toString());
     if (recipientSocket) {
       io.to(recipientSocket).emit('receiveMessage', messageData);
     } else {
-      // Store in offline queue if recipient is offline
       if (!offlineMessages.has(receiverId.toString())) {
         offlineMessages.set(receiverId.toString(), []);
       }
@@ -76,7 +69,6 @@ io.on('connection', (socket) => {
     }
   });
 
-  // Handle disconnection
   socket.on('disconnect', () => {
     console.log('A user disconnected:', socket.id);
     onlineUsers.forEach((value, key) => {

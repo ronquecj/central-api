@@ -120,14 +120,12 @@ export const sendMessage = async (req, res) => {
     let { text, receiverModel, senderId, senderModel } = req.body;
     const { id: receiverId } = req.params;
 
-    // Validate receiver role
     if (!['User', 'Admin', 'SuperAdmin'].includes(receiverModel)) {
       return res
         .status(400)
         .json({ message: 'Invalid receiver model type' });
     }
 
-    // Enforce chat rules
     if (senderModel === 'User' && receiverModel !== 'Admin') {
       return res
         .status(403)
