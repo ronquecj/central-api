@@ -174,7 +174,9 @@ export const loginAdmin = async (req, res) => {
     if (user.status !== 'Approved') {
       return res
         .status(403)
-        .json({ msg: 'Account is not approved yet.' });
+        .json({
+          msg: `Account is not approved yet. \nAccount Status: ${user.status}`,
+        });
     }
 
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
