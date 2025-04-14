@@ -98,7 +98,7 @@ const patchDocument = async (data) => {
   const docPath = path.join(
     __dirname,
     '../templates',
-    'BARANGAY_CLEARANCE.docx'
+    'BARANGAY_CLEARANCE_2022.docx'
   );
   console.log('Resolved document path:', docPath);
 
@@ -138,8 +138,27 @@ const patchDocument = async (data) => {
     JSON.stringify(qrCodeData)
   );
 
+  const dateNow = new Date();
+  const birthDate = new Date(data.dateOfBirth);
+  const age = dateNow.getFullYear() - birthDate.getFullYear();
+
+  const day = now.getDate();
+  const month = now.toLocaleString('en-US', { month: 'long' }); // e.g. April
+  const year = now.getFullYear();
+
+  const formatted = dateNow.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
+
   await doc.renderAsync({
     name: data.name,
+    dateOfBirth: data.dateOfBirth,
+    age: age,
+    day: day,
+    month: month,
+    year: year,
     date: decryptedDate,
     image: `data:image/png;base64,${qrCodeBase64}`,
   });
@@ -285,6 +304,8 @@ export const markRequestAs = async (req, res) => {
         date: updatedRequest.date,
         purpose: updatedRequest.purpose,
         quantity: updatedRequest.quantity,
+        dateOfBirth: updatedRequest.dateOfBirth,
+        placeOfBirth: updatedRequest.placeOfBirth,
         id: updatedRequest._id,
         name: `${updatedRequest.userData.firstName} ${updatedRequest.userData.lastName}`,
       });
