@@ -142,9 +142,9 @@ const patchDocument = async (data) => {
   const birthDate = new Date(data.dateOfBirth);
   const age = dateNow.getFullYear() - birthDate.getFullYear();
 
-  const day = now.getDate();
-  const month = now.toLocaleString('en-US', { month: 'long' }); // e.g. April
-  const year = now.getFullYear();
+  const day = dateNow.getDate();
+  const month = dateNow.toLocaleString('en-US', { month: 'long' }); // e.g. April
+  const year = dateNow.getFullYear();
 
   const formatted = dateNow.toLocaleDateString('en-US', {
     year: 'numeric',
