@@ -140,9 +140,10 @@ const patchDocument = async (data) => {
 
   const dateNow = new Date();
   const birthDate = new Date(data.dateOfBirth);
-  const age = dateNow.getFullYear() - birthDate.getFullYear();
+  const age =
+    Number(dateNow.getFullYear()) - Number(birthDate.getFullYear());
 
-  const day = dateNow.getDate();
+  const day = dateNow.getDate() + 1;
   const month = dateNow.toLocaleString('en-US', { month: 'long' }); // e.g. April
   const year = dateNow.getFullYear();
 
@@ -304,7 +305,7 @@ export const markRequestAs = async (req, res) => {
         date: updatedRequest.date,
         purpose: updatedRequest.purpose,
         quantity: updatedRequest.quantity,
-        dateOfBirth: updatedRequest.dateOfBirth,
+        dateOfBirth: updatedRequest.userData.dateOfBirth,
         placeOfBirth: updatedRequest.placeOfBirth,
         id: updatedRequest._id,
         name: `${updatedRequest.userData.firstName} ${updatedRequest.userData.lastName}`,
