@@ -98,7 +98,7 @@ const patchDocument = async (data) => {
   const docPath = path.join(
     __dirname,
     '../templates',
-    'BARANGAY_CLEARANCE_2022.doc'
+    'BARANGAY_CLEARANCE_2022.docx'
   );
   console.log('Resolved document path:', docPath);
 
