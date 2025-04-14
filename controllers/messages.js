@@ -135,12 +135,6 @@ export const sendMessage = async (req, res) => {
         .json({ message: 'Invalid receiver model type' });
     }
 
-    if (senderModel === 'User' && receiverModel !== 'Admin') {
-      return res
-        .status(403)
-        .json({ message: 'Users can only message Admins' });
-    }
-
     if (senderModel === 'SuperAdmin' && receiverModel === 'User') {
       text = `[SYSTEM]: ${text}`;
     }
