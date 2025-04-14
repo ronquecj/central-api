@@ -124,7 +124,6 @@ export const getAllMessages = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
-
 export const sendMessage = async (req, res) => {
   try {
     let { text, receiverModel, senderId, senderModel } = req.body;
@@ -141,16 +140,11 @@ export const sendMessage = async (req, res) => {
         .status(403)
         .json({ message: 'Users can only message Admins' });
     }
+
     if (senderModel === 'SuperAdmin' && receiverModel === 'User') {
       text = `[SYSTEM]: ${text}`;
     }
-    // if (senderModel === 'SuperAdmin' && receiverModel !== 'Admin') {
-    //   return res
-    //     .status(403)
-    //     .json({ message: 'SuperAdmins can only message Admins' });
-    // }
 
-    // Save message to DB
     const newMessage = new Message({
       text,
       senderId,
@@ -161,19 +155,8 @@ export const sendMessage = async (req, res) => {
 
     await newMessage.save();
 
-    // Store the message in a queue if recipient is offline
-    if (!onlineUsers.has(receiverId.toString())) {
-      if (!offlineMessages.has(receiverId.toString())) {
-        offlineMessages.set(receiverId.toString(), []);
-      }
-      offlineMessages.get(receiverId.toString()).push(newMessage);
-    }
-
-    // Send in real-time if recipient is online
-    const recipientSocket = onlineUsers.get(receiverId.toString());
-    if (recipientSocket) {
-      io.to(recipientSocket).emit('receiveMessage', newMessage);
-    }
+    // Just emit regardless of online status
+    io.emit('receiveMessage', newMessage);
 
     res.status(201).json(newMessage);
   } catch (err) {
