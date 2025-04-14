@@ -188,6 +188,7 @@ export const newRequest = async (req, res) => {
 
     const requestData = `${type}-${date}-${purpose}-${quantity}-${user._id}`;
     const startTime = performance.now();
+
     const requestHash = CryptoJS.SHA256(requestData).toString();
     const endTime = performance.now();
 
@@ -381,7 +382,7 @@ export const getAllRequestHistory = async (req, res) => {
   try {
     const requests = await Request.find(
       {},
-      'userData history requestHash previousHash'
+      'email type status quantity date purpose userData history requestHash previousHash'
     );
     console.log('request', requests);
 
@@ -394,6 +395,12 @@ export const getAllRequestHistory = async (req, res) => {
     const historyData = requests.map((request) => ({
       user: `${request.userData.firstName} ${request.userData.lastName}`,
       email: request.userData.email,
+      type: request.type,
+      status: request.status,
+      quantity: request.quantity,
+      date: request.date,
+      purpose: request.purpose,
+      userData: request.userData,
       requestHash: request.requestHash,
       previousHash: request.previousHash,
       history: request.history.map((entry) => ({
@@ -498,6 +505,16 @@ export const predictRequests = async (req, res) => {
     });
   } catch (error) {
     console.error(error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+export const getAllRequest = async (req, res) => {
+  try {
+    const requests = await Request.find({});
+
+    res.status(200).json({ requests });
+  } catch (err) {
     res.status(500).json({ message: 'Server error' });
   }
 };

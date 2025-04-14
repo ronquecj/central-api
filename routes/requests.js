@@ -10,6 +10,7 @@ import {
   getAllRequestHistory,
   predictRequests,
   deleteAllRequest,
+  getAllRequest,
 } from '../controllers/request.js';
 
 import { markAdminAs } from '../controllers/adminver.js';
@@ -17,6 +18,7 @@ import { markAdminAs } from '../controllers/adminver.js';
 const router = express.Router();
 
 // REQUEST
+router.get('/all', getAllRequest);
 router.post('/new', newRequest);
 router.post('/mark', markRequestAs);
 router.get('/', getRequest);
