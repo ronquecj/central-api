@@ -94,11 +94,23 @@ const imageOptions = {
   },
 };
 
+const types = [
+  'BARANGAY_CLEARANCE.docx',
+  'INDIGENCY_Certificate_NEW.docx',
+  'Residency_Certificate_inbehalf.docx',
+];
+
 const patchDocument = async (data) => {
   const docPath = path.join(
     __dirname,
     '../templates',
-    'BARANGAY_CLEARANCE.docx'
+    `${
+      data.type == 'Barangay Clearance'
+        ? types[0]
+        : data.type == 'Barangay Indigency'
+        ? types[1]
+        : types[2]
+    }`
   );
   console.log('Resolved document path:', docPath);
 
