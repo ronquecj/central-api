@@ -172,6 +172,7 @@ const patchDocument = async (data) => {
     day: day,
     month: month,
     year: year,
+    purpose: data.purpose,
     date: decryptedDate,
     image: `data:image/png;base64,${qrCodeBase64}`,
   });
