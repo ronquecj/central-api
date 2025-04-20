@@ -311,9 +311,14 @@ export const markRequestAs = async (req, res) => {
       { new: true }
     );
 
+    const decryptedType = await CryptoJS.AES.decrypt(
+      updatedRequest.type,
+      SECRET_KEY
+    ).toString(CryptoJS.enc.Utf8);
+
     if (status === 'Processing') {
       const documentPath = await patchDocument({
-        type: updatedRequest.type,
+        type: decryptedType,
         date: updatedRequest.date,
         purpose: updatedRequest.purpose,
         quantity: updatedRequest.quantity,
