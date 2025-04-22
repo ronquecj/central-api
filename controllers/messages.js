@@ -5,6 +5,7 @@ import User from '../models/User.js';
 import Admin from '../models/Admin.js';
 import SuperAdmin from '../models/SuperAdmin.js';
 import { io, onlineUsers, offlineMessages } from '../server.js'; // Assuming server.js exports these
+import mongoose from 'mongoose';
 
 // Function to determine model type (you might already have this elsewhere)
 const determineModel = (userDoc) => {
@@ -143,12 +144,9 @@ export const getUsersForSidebar = async (req, res) => {
     res.status(200).json(validUsers);
   } catch (err) {
     console.error('Error in getUsersForSidebar:', err); // Log the full error
-    res
-      .status(500)
-      .json({
-        message:
-          err.message || 'Internal server error fetching users',
-      });
+    res.status(500).json({
+      message: err.message || 'Internal server error fetching users',
+    });
   }
 };
 
@@ -218,11 +216,9 @@ export const getMessages = async (req, res) => {
     res.status(200).json(messages);
   } catch (err) {
     console.error('Error in getMessages:', err);
-    res
-      .status(500)
-      .json({
-        message: err.message || 'Failed to retrieve messages',
-      });
+    res.status(500).json({
+      message: err.message || 'Failed to retrieve messages',
+    });
   }
 };
 
