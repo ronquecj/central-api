@@ -11,6 +11,8 @@ import {
   predictRequests,
   deleteAllRequest,
   getAllRequest,
+  deleteAllAdmin,
+  deleteAllUser,
 } from '../controllers/request.js';
 
 import { markAdminAs, markUserAs } from '../controllers/adminver.js';
@@ -26,6 +28,8 @@ router.get('/verify/:id', verifyRequest);
 router.get('/:id/history', getRequestHistory);
 router.get('/predict', predictRequests);
 router.delete('/deleteall', deleteAllRequest);
+router.delete('/delete-admin', deleteAllAdmin);
+router.delete('/delete-user', deleteAllUser);
 router.delete('/delete/:id', deleteRequest);
 router.get('/history', getAllRequestHistory);
 router.get('/:id', getRequestById);

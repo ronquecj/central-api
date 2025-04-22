@@ -422,6 +422,30 @@ export const deleteAllRequest = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+export const deleteAllAdmin = async (req, res) => {
+  try {
+    const deletedRequests = await Admin.deleteMany({});
+
+    res.status(200).json({
+      message: 'All requests deleted successfully',
+      deletedCount: deletedRequests.deletedCount,
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+export const deleteAllUser = async (req, res) => {
+  try {
+    const deletedRequests = await User.deleteMany({});
+
+    res.status(200).json({
+      message: 'All requests deleted successfully',
+      deletedCount: deletedRequests.deletedCount,
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
 
 export const getAllRequestHistory = async (req, res) => {
   try {
