@@ -12,6 +12,7 @@ import QRCode from 'qrcode';
 import ImageModule from 'docxtemplater-image-module-free';
 import tf from '@tensorflow/tfjs';
 import { performance } from 'perf_hooks';
+import Admin from '../models/Admin.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
