@@ -13,7 +13,7 @@ import {
   getAllRequest,
 } from '../controllers/request.js';
 
-import { markAdminAs } from '../controllers/adminver.js';
+import { markAdminAs, markUserAs } from '../controllers/adminver.js';
 
 const router = express.Router();
 
@@ -31,5 +31,6 @@ router.get('/history', getAllRequestHistory);
 router.get('/:id', getRequestById);
 
 router.post('/mark-admin', markAdminAs);
+router.post('/mark-user', markUserAs);
 
 export default router;

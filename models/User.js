@@ -47,6 +47,26 @@ const UserSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    status: {
+      type: String,
+      default: 'Pending',
+    },
+    history: [
+      {
+        status: {
+          type: String,
+          default: 'Pending',
+        },
+        modifiedBy: {
+          type: String,
+          required: true,
+        },
+        modifiedAt: {
+          type: Date,
+          default: Date.now,
+        },
+      },
+    ],
   },
   { timestamps: true }
 );

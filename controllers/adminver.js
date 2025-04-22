@@ -313,6 +313,48 @@ export const markAdminAs = async (req, res) => {
   }
 };
 
+export const markUserAs = async (req, res) => {
+  try {
+    const { id, status, modifiedBy } = req.body;
+    const user = await User.findById(id);
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(
+      id,
+      {
+        $set: {
+          status,
+        },
+        $push: {
+          history: {
+            status,
+            modifiedBy,
+          },
+        },
+      },
+      { new: true }
+    );
+
+    if (status) {
+      await sendStatusEmail(updatedUser.email, status);
+
+      return res.status(200).json({
+        message: 'Request processed, document sent via email',
+        updatedUser,
+      });
+    }
+
+    res
+      .status(200)
+      .json({ message: 'Request status updated', updatedUser });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
 export const getRequestHistory = async (req, res) => {
   try {
     const { id } = req.params;
