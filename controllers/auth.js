@@ -160,8 +160,8 @@ export const loginSuperAdmin = async (req, res) => {
 
 export const loginAdmin = async (req, res) => {
   try {
-    const { username, password } = req.body;
-    const user = await Admin.findOne({ username: username });
+    const { email, password } = req.body;
+    const user = await Admin.findOne({ email });
 
     if (!user)
       return res.status(400).json({ msg: 'User does not exist.' });
@@ -172,11 +172,9 @@ export const loginAdmin = async (req, res) => {
       return res.status(400).json({ msg: 'Invalid credentials.' });
 
     if (user.status !== 'Approved') {
-      return res
-        .status(403)
-        .json({
-          msg: `Account is not approved yet. \nAccount Status: ${user.status}`,
-        });
+      return res.status(403).json({
+        msg: `Account is not approved yet. \nAccount Status: ${user.status}`,
+      });
     }
 
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
