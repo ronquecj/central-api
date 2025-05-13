@@ -23,12 +23,11 @@ app.use(bodyParser.json({ limit: '30mb', extended: true }));
 app.use(bodyParser.urlencoded({ limit: '30mb', extended: true }));
 app.use(cors());
 
-app.use('/api/uploads', express.static('uploads'));
-
 app.use('/api/auth', authRoutes);
 app.use('/api/user', userRoutes);
 app.use('/api/request', requestRoutes);
 app.use('/api/message', messageRoutes);
+app.use('/api/uploads', express.static('uploads'));
 
 const PORT = process.env.PORT || 6001;
 const server = createServer(app);
