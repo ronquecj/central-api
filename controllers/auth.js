@@ -19,6 +19,11 @@ export const registerUser = async (req, res) => {
       phoneNumber,
     } = req.body;
 
+    const idPhoto = req.file?.path;
+    if (!idPhoto) {
+      return res.status(400).json({ error: 'ID photo is required.' });
+    }
+
     const salt = await bcryptjs.genSalt();
     const passwordHash = await bcryptjs.hash(password, salt);
 
@@ -32,6 +37,7 @@ export const registerUser = async (req, res) => {
       placeOfBirth,
       sex,
       phoneNumber,
+      idPhoto,
     });
 
     const savedUser = await newUser.save();

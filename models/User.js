@@ -51,6 +51,10 @@ const UserSchema = new mongoose.Schema(
       type: String,
       default: 'Pending',
     },
+    idPhoto: {
+      type: String,
+      required: true,
+    },
     history: [
       {
         status: {

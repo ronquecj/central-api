@@ -8,12 +8,13 @@ import {
   registerAdmin,
   changeSuperAdminPassword,
 } from '../controllers/auth.js';
+import upload from '../middleware/upload.js';
 
 const router = express.Router();
 
 // USER
 router.post('/user/login', loginUser);
-router.post('/user/register', registerUser);
+router.post('/user/register', upload.single('idPhoto'), registerUser);
 
 // SuperAdmin
 router.post('/super-admin/login', loginSuperAdmin);
