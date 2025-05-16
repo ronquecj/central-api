@@ -23,6 +23,10 @@ router.post('/super-admin/change-password', changeSuperAdminPassword);
 
 // Admin
 router.post('/admin/login', loginAdmin);
-router.post('/admin/register', registerAdmin);
+router.post(
+  '/admin/register',
+  upload.single('idPhoto'),
+  registerAdmin
+);
 
 export default router;

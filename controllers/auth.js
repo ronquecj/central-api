@@ -105,12 +105,18 @@ export const registerAdmin = async (req, res) => {
   try {
     const { email, password } = req.body;
 
+    const idPhoto = req.file?.path;
+    if (!idPhoto) {
+      return res.status(400).json({ error: 'ID photo is required.' });
+    }
+
     const salt = await bcryptjs.genSalt();
     const passwordHash = await bcryptjs.hash(password, salt);
 
     const newAdmin = new Admin({
       email,
       password: passwordHash,
+      idPhoto,
       history: [{ modifiedBy: email }],
     });
 

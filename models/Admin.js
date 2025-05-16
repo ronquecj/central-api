@@ -16,6 +16,10 @@ const AdminSchema = new mongoose.Schema(
       required: true,
       default: true,
     },
+    idPhoto: {
+      type: String,
+      required: true,
+    },
     history: [
       {
         status: {
