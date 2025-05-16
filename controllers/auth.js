@@ -104,14 +104,17 @@ export const changeSuperAdminPassword = async (req, res) => {
 export const registerAdmin = async (req, res) => {
   try {
     const { email, password } = req.body;
-
+    console.log('password', password);
     const idPhoto = req.file?.path;
+    console.log('idPhoto', idPhoto);
     if (!idPhoto) {
       return res.status(400).json({ error: 'ID photo is required.' });
     }
 
     const salt = await bcryptjs.genSalt();
     const passwordHash = await bcryptjs.hash(password, salt);
+
+    console.log('passwordHash', passwordHash);
 
     const newAdmin = new Admin({
       email,
