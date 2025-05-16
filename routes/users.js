@@ -4,6 +4,7 @@ import {
   getSuperAdmin,
   getAllAdmins,
   getAllUsers,
+  editUser,
 } from '../controllers/users.js';
 import { verifyToken } from '../middleware/auth.js';
 
@@ -13,6 +14,7 @@ const router = express.Router();
 router.get('/superadmin', getSuperAdmin);
 router.get('/admins', getAllAdmins);
 router.get('/all', getAllUsers);
+router.get('/edit/:id', editUser);
 router.get('/:id', getUser);
 
 // UPDATE
