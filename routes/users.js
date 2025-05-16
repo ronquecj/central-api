@@ -14,7 +14,7 @@ const router = express.Router();
 router.get('/superadmin', getSuperAdmin);
 router.get('/admins', getAllAdmins);
 router.get('/all', getAllUsers);
-router.get('/edit/:id', editUser);
+router.post('/edit/:id', editUser);
 router.get('/:id', getUser);
 
 // UPDATE
